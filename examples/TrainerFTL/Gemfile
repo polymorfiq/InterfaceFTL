@@ -1,0 +1,4 @@
+# A sample Gemfile
+source "https://rubygems.org"
+gem "OSXMemory", :git => "https://github.com/fingerco/OSXMemory.git"
+gem "InterfaceFTL", :git => "https://github.com/fingerco/InterfaceFTL.git"
