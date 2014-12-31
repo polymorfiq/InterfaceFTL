@@ -19,20 +19,30 @@ class TrainerFTL
 
     InterfaceFTL.instance.add_breakpoint(keypress_offset) do |thread|
       tilde_keycode = 0x60
+      home_keycode = 0x116
 
-      if thread.state.r14 == tilde_keycode
-        puts "\n\n----- Game Report -----\n"
-        puts "Player controls #{CrewMemberFactory.player_crew_count} crew members"
-        puts "Player controls #{CrewMemberFactory.enemy_crew_count} enemy crew members"
-        crew_members = CrewMemberFactory.crew_list
+      case thread.state.r14
+        when tilde_keycode
+          puts "\n\n----- Game Report -----\n"
+          puts "Player controls #{CrewMemberFactory.player_crew_count} crew members"
+          puts "Player controls #{CrewMemberFactory.enemy_crew_count} enemy crew members"
+          crew_members = CrewMemberFactory.crew_list
 
-        crew_members.each {|member|
-          puts "--------"
-          puts "Member Position: (#{member.position.x}, #{member.position.y})"
-          puts "Member Ship: #{member.ship_number}"
-          puts "Member Boarded Ship: #{member.boarded_ship_number}"
-        }
-      end
+          crew_members.each {|member|
+            puts "\n----- Member Report -----"
+            puts "Member Species: #{member.species}"
+            puts "Member Position: (#{member.position.x}, #{member.position.y})"
+            puts "Member Ship: #{member.ship_number}"
+            puts "Member Boarded Ship: #{member.boarded_ship_number}"
+          }
+        when home_keycode
+          puts "\n\nKilling all friendly crew members...\n\n"
+          crew_members = CrewMemberFactory.crew_list
+
+          crew_members.each {|member|
+            member.boarded_ship_number = 1 if member.ship_number == 0
+          }
+        end
     end
   end
 

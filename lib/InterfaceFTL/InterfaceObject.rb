@@ -14,6 +14,10 @@ module InterfaceFTL
     def read_address_from(addr, size = 8)
       game_instance.read(addr, size).unpack('Q').first
     end
+
+    def read_string(addr, max_size = 100)
+      game_instance.read(addr, max_size).unpack("A#{max_size}").first
+    end
   end
 
   class InterfaceObjectSchema
@@ -28,6 +32,7 @@ module InterfaceFTL
 
     def set(property, value)
       packer = nil
+      should_pause = false
 
       case property[:type]
       when :uint
@@ -35,12 +40,15 @@ module InterfaceFTL
       when :int
         packer = 'l'
       when :address
+        should_pause = true
         packer = 'Q'
       when :base
         return
       end
 
+      game_instance.suspend if should_pause
       game_instance.write(@schema[:base][:offset] + property[:offset], [value].pack(packer))
+      game_instance.resume if should_pause
     end
 
     def get(property)
