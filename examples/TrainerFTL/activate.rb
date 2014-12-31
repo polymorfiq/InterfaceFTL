@@ -17,6 +17,8 @@ class TrainerFTL
   def activate
     keypress_offset = 0x10013ba18
 
+    crew_members = CrewMemberFactory.crew_list
+
     InterfaceFTL.instance.add_breakpoint(keypress_offset) do |thread|
       tilde_keycode = 0x60
       home_keycode = 0x116
@@ -36,12 +38,14 @@ class TrainerFTL
             puts "Member Boarded Ship: #{member.boarded_ship_number}"
           }
         when home_keycode
-          puts "\n\nKilling all friendly crew members...\n\n"
+          puts "\n\nTaking control of all enemy crew members...\n\n"
           crew_members = CrewMemberFactory.crew_list
 
-          crew_members.each {|member|
-            member.boarded_ship_number = 1 if member.ship_number == 0
-          }
+          crew_members.each do |member|
+            if member.ship_number == 1
+              member.ship_number = 0
+            end
+          end
         end
     end
   end
