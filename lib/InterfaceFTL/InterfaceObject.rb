@@ -11,12 +11,16 @@ module InterfaceFTL
       game_instance.read(addr, size).unpack('L').first
     end
 
+    def read_float(addr, size = 8)
+      game_instance.read(addr, size).unpack("F").first
+    end
+
     def read_address_from(addr, size = 8)
       game_instance.read(addr, size).unpack('Q').first
     end
 
     def read_string(addr, max_size = 100)
-      game_instance.read(addr, max_size).unpack("A#{max_size}").first
+      game_instance.read(addr, max_size).unpack("Z#{max_size}").first
     end
   end
 
@@ -39,6 +43,8 @@ module InterfaceFTL
         packer = 'L'
       when :int
         packer = 'l'
+      when :float
+        packer = 'F'
       when :address
         should_pause = true
         packer = 'Q'
@@ -59,8 +65,12 @@ module InterfaceFTL
         read_unsigned_int(@schema[:base][:offset] + property[:offset])
       when :int
         read_signed_int(@schema[:base][:offset] + property[:offset])
+      when :float
+        read_float(@schema[:base][:offset] + property[:offset])
       when :address
         read_address_from(@schema[:base][:offset] + property[:offset])
+      when :string
+        read_string(read_address_from(@schema[:base][:offset] + property[:offset]))
       when :base
         return
       end

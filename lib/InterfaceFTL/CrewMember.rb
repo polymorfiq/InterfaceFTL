@@ -20,8 +20,6 @@ module InterfaceFTL
       self.schema[:base][:offset] = base_offset
     end
 
-    def species; read_string(self.species_address, 20); end
-
     def position
       OpenStruct.new({x: position_x, y: position_y})
     end
@@ -32,11 +30,13 @@ module InterfaceFTL
 
     define_schema({
       base: {type: :base, offset: 0x0},
+      name: {type: :string, offset: 0x2a0},
       boarded_ship_number: {type: :int, offset: 0x8},
       position_x: {type: :int, offset: 0x18},
       position_y: {type: :int, offset: 0X1C},
       ship_number: {type: :int, offset: 0x194},
-      species_address: {type: :address, offset: 0x220}
+      species: {type: :string, offset: 0x220},
+      health: {type: :float, offset: 0x38}
     })
 
   end

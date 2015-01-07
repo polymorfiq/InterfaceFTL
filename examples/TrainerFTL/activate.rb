@@ -22,6 +22,7 @@ class TrainerFTL
     InterfaceFTL.instance.add_breakpoint(keypress_offset) do |thread|
       tilde_keycode = 0x60
       home_keycode = 0x116
+      end_keycode = 0x117
 
       case thread.state.r14
         when tilde_keycode
@@ -32,6 +33,8 @@ class TrainerFTL
 
           crew_members.each {|member|
             puts "\n----- Member Report -----"
+            puts "Member Name: #{member.name}"
+            puts "Member Health: #{member.health}"
             puts "Member Species: #{member.species}"
             puts "Member Position: (#{member.position.x}, #{member.position.y})"
             puts "Member Ship: #{member.ship_number}"
@@ -42,11 +45,22 @@ class TrainerFTL
           crew_members = CrewMemberFactory.crew_list
 
           crew_members.each do |member|
-            if member.ship_number == 1
+            if member.ship_number != 0
               member.ship_number = 0
             end
           end
-        end
+        when end_keycode
+          puts "\n\nKilling everyone on enemy ship...\n\n"
+          crew_members = CrewMemberFactory.crew_list
+
+          crew_members.each do |member|
+            if member.boarded_ship_number != 0
+              member.health = 0
+            end
+          end
+        else
+          puts "Unknown key hit. Code: #{thread.state.r14.to_s(16)}"
+      end
     end
   end
 
