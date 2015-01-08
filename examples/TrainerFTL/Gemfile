@@ -1,7 +1,8 @@
 # A sample Gemfile
 source "https://rubygems.org"
 gem "ffi"
+# gem "OSXMemory", :path => "~/projects/OSXMemory"
 gem "OSXMemory", :git => "https://github.com/fingerco/OSXMemory.git"
-gem "InterfaceFTL", :path => "~/projects/InterfaceFTL"
-# gem "InterfaceFTL", :git => "https://github.com/fingerco/InterfaceFTL.git"
+# gem "InterfaceFTL", :path => "~/projects/InterfaceFTL"
+gem "InterfaceFTL", :git => "https://github.com/fingerco/InterfaceFTL.git"
 gem "sys-proctable"

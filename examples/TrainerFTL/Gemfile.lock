@@ -1,15 +1,14 @@
-GIT
-  remote: https://github.com/fingerco/OSXMemory.git
-  revision: 553956ce55d1d40f43916d9f2da90042ff9c5a0e
-  specs:
-    OSXMemory (0.0.1)
-      ffi
-
 PATH
   remote: ~/projects/InterfaceFTL
   specs:
     InterfaceFTL (0.0.1)
       InterfaceFTL
+
+PATH
+  remote: ~/projects/OSXMemory
+  specs:
+    OSXMemory (0.0.1)
+      ffi
 
 GEM
   remote: https://rubygems.org/

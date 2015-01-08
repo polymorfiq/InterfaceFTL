@@ -22,6 +22,9 @@ module InterfaceFTL
     def read_string(addr, max_size = 100)
       game_instance.read(addr, max_size).unpack("Z#{max_size}").first
     end
+
+    def allocate_string(string)
+    end
   end
 
   class InterfaceObjectSchema
@@ -37,8 +40,18 @@ module InterfaceFTL
     def set(property, value)
       packer = nil
       should_pause = false
+      write_address = @schema[:base][:offset] + property[:offset]
+      property_type = property[:type]
 
-      case property[:type]
+      if property_type == :string
+        string_data = [value].pack('Z*')
+        new_string_address = game_instance.alloc(string_data.size)
+        game_instance.write(new_string_address, string_data)
+        value = new_string_address
+        property_type = :address
+      end
+
+      case property_type
       when :uint
         packer = 'L'
       when :int
@@ -48,12 +61,15 @@ module InterfaceFTL
       when :address
         should_pause = true
         packer = 'Q'
+      when :string
+        should_pause = true
+        packer = 'Q'
       when :base
         return
       end
 
       game_instance.suspend if should_pause
-      game_instance.write(@schema[:base][:offset] + property[:offset], [value].pack(packer))
+      game_instance.write(write_address, [value].pack(packer))
       game_instance.resume if should_pause
     end
 

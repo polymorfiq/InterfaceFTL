@@ -5,14 +5,14 @@ module InterfaceFTL
   class CrewMember < InterfaceObject
 
     module Species
-      HUMAN = 0x10022d174
-      ENG = 0x10022bf9d
-      GHOST = 0x10023f083
-      ENERGY = 0x10023f074
-      ROCK = 0x10024333c
-      SLUG = 0x10023f07b
-      MANTIS = 0x10023f3a6
-      ANAEROBIC = 0x10023f065
+      HUMAN = "human"
+      ENGI = "engi"
+      GHOST = "ghost"
+      ENERGY = "energy"
+      ROCK = "rock"
+      SLUG = "slug"
+      MANTIS = "mantis"
+      ANAEROBIC = "anaerobic"
     end
 
     def initialize(base_offset)
