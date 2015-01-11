@@ -19,6 +19,11 @@ class TrainerFTL
 
     crew_members = CrewMemberFactory.crew_list
 
+    InterfaceFTL.instance.add_breakpoint(0x1000ccc8c) do |thread|
+      puts "HIT KILL CREWMEMBER"
+      puts thread.state.dump
+    end
+
     InterfaceFTL.instance.add_breakpoint(keypress_offset) do |thread|
       tilde_keycode = 0x60
       home_keycode = 0x116
@@ -33,28 +38,36 @@ class TrainerFTL
 
           crew_members.each {|member|
             puts "\n----- Member Report -----"
-            puts "Member Name: #{member.name}"
-            puts "Member Health: #{member.health}"
-            puts "Member Species: #{member.species}"
-            puts "Member Position: (#{member.position.x}, #{member.position.y})"
-            puts "Member Ship: #{member.ship_number}"
-            puts "Member Boarded Ship: #{member.boarded_ship_number}"
+            puts "Name: #{member.name}"
+            puts "Health: #{member.health}"
+            puts "Provides Vision?: #{member.provides_vision?}"
+            puts "Species: #{member.species}"
+            puts "Position: (#{member.position_x}, #{member.position_y})"
+            puts "World Position: (#{member.world_position_x}, #{member.world_position_y})"
+            puts "Owner Ship: #{member.owner_ship}"
+            puts "Boarded Ship: #{member.boarded_ship}"
+            puts "Room Number: #{member.room_number}"
+            puts "Room Position: (#{member.room_x}, #{member.room_y})"
+            puts "Ship Address: #{member.ship_address.to_s(16)}"
           }
         when home_keycode
           puts "\n\nTaking control of all enemy crew members...\n\n"
           crew_members = CrewMemberFactory.crew_list
+          safe_member = crew_members.select {|member| member.boarded_ship == 0 }.first if crew_members.size > 0
 
           crew_members.each do |member|
-            if member.ship_number != 0
-              member.ship_number = 0
-            end
+            args = [
+              {register: :rdi, value: member.base_offset}
+            ]
+
+            InterfaceFTL.add_function_call(0x1000ff42c, 0x1000ccc8c, args)
           end
         when end_keycode
           puts "\n\nKilling everyone on enemy ship...\n\n"
           crew_members = CrewMemberFactory.crew_list
 
           crew_members.each do |member|
-            if member.boarded_ship_number != 0
+            if member.boarded_ship != 0
               member.health = 0
             end
           end
