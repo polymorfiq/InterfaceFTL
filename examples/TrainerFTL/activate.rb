@@ -17,13 +17,6 @@ class TrainerFTL
   def activate
     keypress_offset = 0x10013ba18
 
-    crew_members = CrewMemberFactory.crew_list
-
-    InterfaceFTL.instance.add_breakpoint(0x1000ccc8c) do |thread|
-      puts "HIT KILL CREWMEMBER"
-      puts thread.state.dump
-    end
-
     InterfaceFTL.instance.add_breakpoint(keypress_offset) do |thread|
       tilde_keycode = 0x60
       home_keycode = 0x116
@@ -51,23 +44,19 @@ class TrainerFTL
             puts "Ship Address: #{member.ship_address.to_s(16)}"
           }
         when home_keycode
-          puts "\n\nTaking control of all enemy crew members...\n\n"
-          crew_members = CrewMemberFactory.crew_list
-          safe_member = crew_members.select {|member| member.boarded_ship == 0 }.first if crew_members.size > 0
+          puts "\n\nKilling enemies when 'Save Positions' is hit\n\n"
+          crew_members = CrewMemberFactory.crew_list.select{|member| member.owner_ship != 0}
 
           crew_members.each do |member|
-            args = [
-              {register: :rdi, value: member.base_offset}
-            ]
-
-            InterfaceFTL.add_function_call(0x1000ff42c, 0x1000ccc8c, args)
+            puts "Set to kill #{member.name}"
+            member.add_kill_trigger(0x1000ff42c)
           end
         when end_keycode
           puts "\n\nKilling everyone on enemy ship...\n\n"
           crew_members = CrewMemberFactory.crew_list
 
           crew_members.each do |member|
-            if member.boarded_ship != 0
+            if member.owner_ship != 0
               member.health = 0
             end
           end
